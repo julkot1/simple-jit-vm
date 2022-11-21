@@ -1,4 +1,5 @@
 #include "include/main.h"
+#include "include/bc_parser.h"
 #include "include/jit_parser.h"
 #include <jit/jit.h>
 #include <stdio.h>
@@ -12,7 +13,7 @@ operation pr[] = {
 
 int main()
 {
-    program p = {.main = pr, .labels_size = 1};
+    program p = parse_program_bc("program.bc");
     init(&p);
     parse_program(&p);
     end(&p);

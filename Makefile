@@ -1,5 +1,5 @@
 CFLAGS=-I. -ljit
-DEPS = include/.h
+DEPS = include/*.h
 OBJ = src/*.o 
 
 %.o: %.c $(DEPS)

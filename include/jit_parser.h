@@ -9,7 +9,7 @@
 void init(program *__pr);
 void parse_program(program *__pr);
 void labels_init(program *__pr);
-void stack_init();
+void stack_init(program *__pr);
 
 void end(program *__pr);
 void parse(operation op, program *__pr);

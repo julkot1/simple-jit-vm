@@ -8,32 +8,31 @@ jit_type_t stack_ptr_t;
 jit_value_t stack_ptr;
 jit_type_t dump_signature;
 
-void stack_init()
+void stack_init(program *__pr)
 {
-    jit_type_t type_cstring = jit_type_create_pointer(jit_type_sys_char, 2);
     jit_type_t params[] = {jit_type_int};
     dump_signature = jit_type_create_signature(
         jit_abi_cdecl, jit_type_int, params, 1, 1);
 
     stack_ptr_t = jit_type_create_pointer(jit_type_sys_int, 4);
     stack_ptr = jit_value_create(GLOBAL_F, jit_type_void_ptr);
-    jit_insn_store(GLOBAL_F, stack_ptr, jit_insn_alloca(GLOBAL_F, CONST_INT(STACK_SIZE)));
+    jit_insn_store(GLOBAL_F, stack_ptr, jit_insn_alloca(GLOBAL_F, CONST_INT(__pr->stack_size)));
 }
 void init(program *__pr)
 {
     jit_init();
     context = jit_context_create();
     GLOBAL_F = jit_function_create(context, jit_type_create_signature(jit_abi_cdecl, jit_type_int, NULL, 0, 1));
-    stack_init();
+    stack_init(__pr);
     labels_init(__pr);
 }
 void parse_program(program *__pr)
 {
-    operation *op = __pr->main;
-    while ((op)->code != BIN_EOP)
+    op_node *op_n = __pr->global;
+    while ((op_n)->op.code != BIN_EOP)
     {
-        parse(*op, __pr);
-        op++;
+        parse(op_n->op, __pr);
+        op_n = op_n->next;
     }
 }
 void labels_init(program *__pr)
@@ -49,7 +48,7 @@ void end(program *__pr)
 {
     // jit_dump_function(stdout, GLOBAL_F, "GLOBAL_F [uncompiled]");
     jit_function_compile(GLOBAL_F);
-    jit_dump_function(stdout, GLOBAL_F, "GLOBAL_F [compiled]");
+    // jit_dump_function(stdout, GLOBAL_F, "GLOBAL_F [compiled]");
     jit_function_apply(GLOBAL_F, NULL, NULL);
     jit_context_destroy(context);
     free(__pr->labels);

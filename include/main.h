@@ -48,11 +48,20 @@ typedef struct
     opcode code;
     int payload;
 } operation;
+typedef struct op_node op_node;
+struct op_node
+{
+    operation op;
+    op_node *next;
+};
+
 typedef struct
 {
-    operation *main;
+    op_node *global;
     int labels_size;
+    int stack_size;
     jit_label_t *labels;
 } program;
+
 int main();
 #endif
