@@ -3,8 +3,17 @@
 #ifndef PARSER
 #define PARSER
 
+#define CONST_UBYTE(v) (jit_value_create_nint_constant(GLOBAL_F, jit_type_nint, v))
 #define CONST_BYTE(v) (jit_value_create_nint_constant(GLOBAL_F, jit_type_ubyte, v))
 #define CONST_INT(v) (jit_value_create_nint_constant(GLOBAL_F, jit_type_int, v))
+#define CONST_LONG(v) (jit_value_create_long_constant(GLOBAL_F, jit_type_long, v))
+struct stack_element
+{
+    type t;
+    payload_value val;
+};
+
+struct stack_element add(struct stack_element a, struct stack_element b);
 
 void init(program *__pr);
 void parse_program(program *__pr);

@@ -78,7 +78,8 @@ operation parse_operation(char *line)
     op.code = str_to_opcode(op_str);
     if (is_payload_operation(op.code))
     {
-        op.payload = atoi(strtok(NULL, "\n"));
+        op.payload_type = NUMBER;
+        op.payload.number = atoi(strtok(NULL, "\n"));
     }
     return op;
 }
@@ -154,5 +155,7 @@ opcode str_to_opcode(const char *str)
         return BIN_RIGHT_SHIFT;
     else if (strcmp(str, TOKEN_EOP) == 0)
         return BIN_EOP;
+    else if (strcmp(str, TOKEN_TYPEOF) == 0)
+        return BIN_TYPEOF;
     return BIN_EOP;
 }

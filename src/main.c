@@ -5,12 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-operation pr[] = {
-    {BIN_PUSH, 60},
-    {BIN_PUSH, 5},
-    {BIN_ADD},
-    {BIN_EOP}};
-
 int main()
 {
     program p = parse_program_bc("program.bc");

@@ -36,6 +36,7 @@
 #define TOKEN_BITWISE_NOT "bnot"
 #define TOKEN_LEFT_SHIFT "shl"
 #define TOKEN_RIGHT_SHIFT "shr"
+#define TOKEN_TYPEOF "typeof"
 #define TOKEN_EOP "eop"
 
 typedef enum

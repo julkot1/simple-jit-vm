@@ -33,6 +33,7 @@ typedef enum
     BIN_BITWISE_NOT,
     BIN_LEFT_SHIFT,
     BIN_RIGHT_SHIFT,
+    BIN_TYPEOF,
     BIN_EOP
 } opcode;
 typedef enum
@@ -42,11 +43,22 @@ typedef enum
     BOOL,
     CHAR,
     PTR,
+    TYPE
 } type;
+typedef union
+{
+    int number;
+    char byte;
+    char *str;
+    void *ptr;
+    unsigned long all;
+} payload_value;
+
 typedef struct
 {
     opcode code;
-    int payload;
+    type payload_type;
+    payload_value payload;
 } operation;
 typedef struct op_node op_node;
 struct op_node
