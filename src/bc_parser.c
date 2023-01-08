@@ -21,14 +21,42 @@ file_section get_section(const char *str)
         return SECTION_GLOBAL;
     else if (strcmp(str, TOKEN_SECTION_DATA) == 0)
         return SECTION_DATA;
-    return SECTION_GLOBAL;
+    return SECTION_CONST;
 }
 void parse_section(FILE *fd, file_section section, program *pr)
 {
     if (section == SECTION_DATA)
         parse_data(fd, pr);
-    if (section == SECTION_GLOBAL)
-        pr->global = parse_global(fd);
+    else if (section == SECTION_GLOBAL)
+        parse_global(fd, pr);
+    else if (section == SECTION_CONST)
+        parse_const_pool(fd, pr);
+}
+void parse_const_pool(FILE *fd, program *pr)
+{
+    pr->const_pool.elements = malloc(sizeof(pool_element) * pr->meta.const_pool_size);
+    pr->const_pool.ptr = 0;
+    size_t len = 0;
+    char *data;
+    char *line = NULL;
+    do
+    {
+        getline(&line, &len, fd);
+        if (*line == '\n')
+            break;
+        data = strtok(line, " ");
+        size_t l = strlen(data);
+        if (data[0] = '\"' && data[l - 2] == '\"')
+        {
+            pool_element *el = &((pr->const_pool.elements)[pr->const_pool.ptr]);
+            el->ref_counter = 0;
+            el->size = l - 3;
+            el->type = STRING;
+            el->val = malloc(sizeof(char) * el->size);
+            strncpy(el->val, data + 1, el->size);
+            pr->const_pool.ptr++;
+        }
+    } while (1);
 }
 
 void parse_data(FILE *fd, program *pr)
@@ -49,13 +77,14 @@ void parse_data(FILE *fd, program *pr)
 void parse_data_value(const char *name, const char *val, program *pr)
 {
     if (strcmp(name, TOKEN_DATA_LABELS) == 0)
-        pr->labels_size = atoi(val);
+        pr->meta.labels_size = atoi(val);
     else if (strcmp(name, TOKEN_DATA_STACK_SIZE) == 0)
-        pr->stack_size = atoi(val);
+        pr->meta.stack_size = atoi(val);
 }
-op_node *parse_global(FILE *fd)
+void parse_global(FILE *fd, program *pr)
 {
-    size_t len = 0;
+    size_t len = 1;
+    pr->meta.operations_size = 0;
     op_node *root = malloc(sizeof(op_node));
     op_node *tmp = root;
     char *line = NULL;
@@ -65,21 +94,40 @@ op_node *parse_global(FILE *fd)
         if (*line == '\n')
             break;
         line[len - 2] = '\0';
-        tmp->op = parse_operation(line);
+        tmp->op = parse_operation(line, pr);
         tmp->next = malloc(sizeof(op_node));
         tmp = tmp->next;
+        pr->meta.operations_size++;
     } while (1);
-    return root;
+    pr->global = malloc(pr->meta.operations_size * sizeof(operation));
+    tmp = root;
+    int idx = 1;
+    while (tmp->op.code != BIN_EOP)
+    {
+        pr->global[idx] = tmp->op;
+        tmp = tmp->next;
+        idx++;
+    }
 }
-operation parse_operation(char *line)
+operation parse_operation(char *line, program *pr)
 {
     operation op;
     char *op_str = opcode_str(line);
     op.code = str_to_opcode(op_str);
     if (is_payload_operation(op.code))
     {
-        op.payload_type = NUMBER;
-        op.payload.number = atoi(strtok(NULL, "\n"));
+        char *payload = strtok(NULL, "\n");
+
+        if (payload[0] == TOKEN_CONST_POOL_MEMBER)
+        {
+            op.payload_type = PTR;
+            op.payload.ptr = &(pr->const_pool.elements[atoi(payload + 1)]);
+        }
+        else
+        {
+            op.payload_type = NUMBER;
+            op.payload.number = atoi(payload);
+        }
     }
     return op;
 }
@@ -157,5 +205,7 @@ opcode str_to_opcode(const char *str)
         return BIN_EOP;
     else if (strcmp(str, TOKEN_TYPEOF) == 0)
         return BIN_TYPEOF;
+    else if (strcmp(str, TOKEN_MOD) == 0)
+        return BIN_MOD;
     return BIN_EOP;
 }

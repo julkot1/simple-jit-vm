@@ -1,18 +1,22 @@
+#pragma once
 #include "main.h"
 #include <stdio.h>
 #include <string.h>
 
 #define TOKEN_SECTION_GLOBAL "::GLOBAL\n"
 #define TOKEN_SECTION_DATA "::DATA\n"
+#define TOKEN_SECTION_CONST "::CONST_POOL\n"
 
 #define TOKEN_DATA_STACK_SIZE ".stack_size"
 #define TOKEN_DATA_LABELS ".labels"
+#define TOKEN_DATA_CONST_SIZE ".const_pool"
 
 #define TOKEN_PUSH "push"
 #define TOKEN_ADD "add"
 #define TOKEN_SUB "sub"
 #define TOKEN_DIV "div"
 #define TOKEN_MUL "mul"
+#define TOKEN_MOD "mod"
 #define TOKEN_DUMP "dump"
 #define TOKEN_POP "pop"
 #define TOKEN_DUP "dup"
@@ -39,16 +43,22 @@
 #define TOKEN_TYPEOF "typeof"
 #define TOKEN_EOP "eop"
 
+#define TOKEN_CONST_POOL_MEMBER '$'
+#define TOKEN_VAR_POOL_MEMBER '@'
+
 typedef enum
 {
     SECTION_GLOBAL,
-    SECTION_DATA
+    SECTION_DATA,
+    SECTION_CONST
+
 } file_section;
 program parse_program_bc(const char *file_path);
 void parse_data(FILE *fd, program *pr);
 void parse_section(FILE *fd, file_section section, program *pr);
-op_node *parse_global(FILE *fd);
-operation parse_operation(char *line);
+void parse_global(FILE *fd, program *pr);
+void parse_const_pool(FILE *fd, program *pr);
+operation parse_operation(char *line, program *pr);
 opcode str_to_opcode(const char *str);
 char *opcode_str(char *str);
 file_section

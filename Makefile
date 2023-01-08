@@ -1,4 +1,4 @@
-CFLAGS=-I. -ljit
+CFLAGS=-I. -ljit 
 DEPS = include/*.h
 OBJ = src/*.o 
 
@@ -9,6 +9,6 @@ bc: $(OBJ)
 	$(CC) -o $@ src/*.c $(CFLAGS)
 	rm $(OBJ)
 debug: $(OBJ)
-	$(CC) -Wall -ggdb -g -o $@ src/*.c
+	$(CC) -Wall -ggdb -g -o $@ src/*.c $(CFLAGS)
 	rm $(OBJ)
 	gdb $@

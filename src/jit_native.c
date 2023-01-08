@@ -23,7 +23,7 @@ native_function create_arg_function(function_ptr fptr, opcode code)
 }
 void types_init()
 {
-    jit_type_t values[] = {jit_type_int, jit_type_sys_char, jit_type_sys_bool, jit_type_void_ptr};
+    jit_type_t values[] = {jit_type_int, jit_type_sys_char, jit_type_sys_bool, jit_type_void_ptr, jit_type_sys_long};
     stack_element_value = jit_type_create_union(values, 4, 1);
     stack_element_value_size = jit_type_get_size(stack_element_value);
     jit_type_t elements[] = {jit_type_ubyte, stack_element_value};
@@ -47,6 +47,7 @@ void types_init()
     native_names[BIN_BITWISE_NOT] = "native_bitwise_not";
     native_names[BIN_LEFT_SHIFT] = "native_left_shift";
     native_names[BIN_RIGHT_SHIFT] = "native_right_shift";
+    native_names[BIN_MOD] = "native_mod";
 
     native_functions[BIN_ADD] = create_two_args_function(native_add, BIN_ADD);
     native_functions[BIN_SUB] = create_two_args_function(native_sub, BIN_SUB);
@@ -65,7 +66,7 @@ void types_init()
     native_functions[BIN_BITWISE_XOR] = create_two_args_function(native_bitwise_xor, BIN_BITWISE_XOR);
     native_functions[BIN_LEFT_SHIFT] = create_two_args_function(native_left_shift, BIN_LEFT_SHIFT);
     native_functions[BIN_RIGHT_SHIFT] = create_two_args_function(native_right_shift, BIN_RIGHT_SHIFT);
-
+    native_functions[BIN_MOD] = create_two_args_function(native_mod, BIN_MOD);
     // native_functions[BIN_NOT] = create_arg_function(native_not, BIN_NOT);
     // native_functions[BIN_BITWISE_NOT] = create_arg_function(native_bitwise_not, BIN_BITWISE_NOT);
 }

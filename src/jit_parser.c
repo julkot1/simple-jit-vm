@@ -14,7 +14,7 @@ void stack_init(program *__pr)
         jit_abi_cdecl, jit_type_int, params, 1, 1);
 
     stack_ptr = jit_value_create(GLOBAL_F, jit_type_void_ptr);
-    jit_insn_store(GLOBAL_F, stack_ptr, jit_insn_alloca(GLOBAL_F, CONST_INT(__pr->stack_size * stack_element_size)));
+    jit_insn_store(GLOBAL_F, stack_ptr, jit_insn_alloca(GLOBAL_F, CONST_INT(__pr->meta.stack_size * stack_element_size)));
 }
 
 void init(program *__pr)
@@ -29,16 +29,15 @@ void init(program *__pr)
 void parse_program(program *__pr)
 {
     op_node *op_n = __pr->global;
-    while ((op_n)->op.code != BIN_EOP)
+    for (size_t i = 0; i < __pr->meta.operations_size; i++)
     {
-        parse(op_n->op, __pr);
-        op_n = op_n->next;
+        parse((__pr->global)[i], __pr);
     }
 }
 void labels_init(program *__pr)
 {
-    __pr->labels = malloc(__pr->labels_size);
-    for (size_t i = 0; i < __pr->labels_size; i++)
+    __pr->labels = malloc(__pr->meta.labels_size * sizeof(jit_label_t));
+    for (size_t i = 0; i < __pr->meta.labels_size; i++)
     {
         __pr->labels[i] = jit_label_undefined;
     }
@@ -46,7 +45,8 @@ void labels_init(program *__pr)
 
 void end(program *__pr)
 {
-    jit_dump_function(stdout, GLOBAL_F, "GLOBAL_F [uncompiled]");
+    push_vm(CONST_INT(0));
+    // jit_dump_function(stdout, GLOBAL_F, "GLOBAL_F [uncompiled]");
     jit_function_compile(GLOBAL_F);
 
     // jit_dump_function(stdout, GLOBAL_F, "GLOBAL_F [compiled]");
@@ -56,7 +56,11 @@ void end(program *__pr)
 }
 void printt(struct stack_element a)
 {
-    printf("(%d) %d\n", a.t, a.val.number);
+    if (a.t == NUMBER)
+        printf("<%d> %d\n", a.t, a.val.number);
+    else if (a.t == PTR)
+        printf("<%d>:<%d> %s \n", a.t, ((pool_element *)a.val.ptr)->type, (char *)((pool_element *)a.val.ptr)->val);
+    return;
 }
 void op_printff(jit_value_t aa)
 {
@@ -84,10 +88,9 @@ void push_vm_with_type(jit_value_t val, jit_value_t type)
 
 void op_push(operation op)
 {
-
-    jit_insn_store_relative(GLOBAL_F, stack_ptr, 0, CONST_BYTE(op.payload_type));
+    jit_insn_store_relative(GLOBAL_F, stack_ptr, 0, CONST_INT(op.payload_type));
     jit_insn_store_relative(GLOBAL_F, stack_ptr, stack_element_value_size, CONST_LONG(op.payload.all));
-    jit_value_t new_ptr = jit_insn_add(GLOBAL_F, stack_ptr, CONST_INT(stack_element_size));
+    jit_value_t new_ptr = jit_insn_add(GLOBAL_F, stack_ptr, CONST_UBYTE(stack_element_size));
     jit_insn_store(GLOBAL_F, stack_ptr, new_ptr);
 }
 
@@ -130,6 +133,7 @@ void op_label(operation op, jit_label_t *labels)
 }
 void op_jmp(operation op, jit_label_t *labels)
 {
+
     jit_insn_branch(GLOBAL_F, &(labels[op.payload.number]));
 }
 void op_jmp_if(operation op, jit_label_t *labels)

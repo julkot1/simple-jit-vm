@@ -6,8 +6,8 @@
 
 #define CONST_UBYTE(v) (jit_value_create_nint_constant(GLOBAL_F, jit_type_nint, v))
 #define CONST_BYTE(v) (jit_value_create_nint_constant(GLOBAL_F, jit_type_ubyte, v))
-#define CONST_INT(v) (jit_value_create_nint_constant(GLOBAL_F, jit_type_nint, v))
-#define CONST_LONG(v) (jit_value_create_long_constant(GLOBAL_F, jit_type_long, v))
+#define CONST_INT(v) (jit_value_create_nint_constant(GLOBAL_F, jit_type_sys_int, v))
+#define CONST_LONG(v) (jit_value_create_long_constant(GLOBAL_F, jit_type_sys_long, v))
 
 void init(program *__pr);
 void parse_program(program *__pr);

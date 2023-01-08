@@ -1,3 +1,4 @@
+#pragma once
 #ifndef MAIN
 #define MAIN
 
@@ -34,6 +35,7 @@ typedef enum
     BIN_LEFT_SHIFT,
     BIN_RIGHT_SHIFT,
     BIN_TYPEOF,
+    BIN_MOD,
     BIN_EOP
 } opcode;
 typedef enum
@@ -66,13 +68,36 @@ struct op_node
     operation op;
     op_node *next;
 };
+typedef struct
+{
+    int operations_size;
+    int labels_size;
+    int stack_size;
+    int const_pool_size;
+    int var_pool_size;
+} program_meta;
+typedef struct
+{
+    type type;
+    int size;
+    int ref_counter;
+    void *val;
+} pool_element;
 
 typedef struct
 {
-    op_node *global;
-    int labels_size;
-    int stack_size;
+    int ptr;
+    pool_element *elements;
+} pool;
+
+typedef struct
+{
+    operation *global;
+    program_meta meta;
     jit_label_t *labels;
+    pool const_pool;
+    pool var_pool;
+
 } program;
 
 int main();
