@@ -4,10 +4,10 @@
 #include <jit/jit.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+program p;
 int main()
 {
-    program p = parse_program_bc("program.bc");
+    p = parse_program_bc("program.bc");
     init(&p);
     parse_program(&p);
     end(&p);

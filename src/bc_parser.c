@@ -207,5 +207,7 @@ opcode str_to_opcode(const char *str)
         return BIN_TYPEOF;
     else if (strcmp(str, TOKEN_MOD) == 0)
         return BIN_MOD;
+    else if (strcmp(str, TOKEN_SIZEOF) == 0)
+        return BIN_SIZEOF;
     return BIN_EOP;
 }

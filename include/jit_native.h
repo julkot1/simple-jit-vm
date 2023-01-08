@@ -40,6 +40,8 @@ extern struct stack_element native_right_shift(struct stack_element a, struct st
 
 extern struct stack_element native_not(struct stack_element a);
 extern struct stack_element native_bitwise_not(struct stack_element a);
+extern struct stack_element native_sizeof(struct stack_element a);
+extern struct stack_element native_typeof(struct stack_element a);
 
 #ifndef FUNC_PTR
 #define FUNC_PTR

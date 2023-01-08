@@ -36,6 +36,7 @@ typedef enum
     BIN_RIGHT_SHIFT,
     BIN_TYPEOF,
     BIN_MOD,
+    BIN_SIZEOF,
     BIN_EOP
 } opcode;
 typedef enum
@@ -79,7 +80,7 @@ typedef struct
 typedef struct
 {
     type type;
-    int size;
+    size_t size;
     int ref_counter;
     void *val;
 } pool_element;

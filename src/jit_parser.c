@@ -48,7 +48,6 @@ void end(program *__pr)
     push_vm(CONST_INT(0));
     // jit_dump_function(stdout, GLOBAL_F, "GLOBAL_F [uncompiled]");
     jit_function_compile(GLOBAL_F);
-
     // jit_dump_function(stdout, GLOBAL_F, "GLOBAL_F [compiled]");
     jit_function_apply(GLOBAL_F, NULL, NULL);
     jit_context_destroy(context);
@@ -60,6 +59,22 @@ void printt(struct stack_element a)
         printf("<%d> %d\n", a.t, a.val.number);
     else if (a.t == PTR)
         printf("<%d>:<%d> %s \n", a.t, ((pool_element *)a.val.ptr)->type, (char *)((pool_element *)a.val.ptr)->val);
+    else if (a.t == TYPE)
+    {
+        if (a.val.number == TYPE)
+            printf("Type\n");
+        else if (a.val.number == NUMBER)
+            printf("Number\n");
+        else if (a.val.number == STRING)
+            printf("String\n");
+        else if (a.val.number == BOOL)
+            printf("Bool\n");
+        else if (a.val.number == CHAR)
+            printf("Char\n");
+        else if (a.val.number == PTR)
+            printf("Ptr\n");
+    }
+
     return;
 }
 void op_printff(jit_value_t aa)
